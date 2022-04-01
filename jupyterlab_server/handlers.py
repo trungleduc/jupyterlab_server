@@ -6,11 +6,11 @@ import os
 from functools import lru_cache
 from urllib.parse import urlparse
 
-from jupyter_server.extension.handler import (
-    ExtensionHandlerJinjaMixin,
-    ExtensionHandlerMixin,
-)
+from jupyter_server.extension.handler import (ExtensionHandlerJinjaMixin,
+                                              ExtensionHandlerMixin)
 from tornado import template, web
+
+from .lsp_handler.lsp import init_lsp
 
 from .config import LabConfig, get_page_config, recursive_update
 from .licenses_handler import LicensesHandler, LicensesManager
@@ -319,7 +319,7 @@ def add_handlers(handlers, extension_app):
     # Let the lab handler act as the fallthrough option instead of a 404.
     fallthrough_url = ujoin(extension_app.app_url, r".*")
     handlers.append((fallthrough_url, NotFoundHandler))
-
+    handlers += init_lsp(extension_app.serverapp)
 
 def _camelCase(base):
     """Convert a string to camelCase.
